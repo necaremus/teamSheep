@@ -8,6 +8,7 @@ import susuPlayer.Bot.Behaviour.Behaviour;
 import susuPlayer.Bot.Utilities.NavigationSystem;
 import susuPlayer.Bot.Utilities.Radar;
 import susuPlayer.Bot.Utilities.Radio;
+import susuPlayer.Constants;
 
 public abstract class Bot {
 
@@ -22,6 +23,8 @@ public abstract class Bot {
 	//*/
 	public RobotController getController() { return rc; }
 
+	public Constants.MapSymmetry mapSymmetry = Constants.MapSymmetry.NONE_DETERMINED;
+
 	public void run() throws GameActionException {
 		while(true) {
 			behaviour = getBehaviour();
@@ -30,10 +33,10 @@ public abstract class Bot {
 		}
 	}
 	public boolean build(RobotType type) throws GameActionException {
-	    return build(type, Direction.getEast(), 360);
+	    return build(type, Direction.getEast(), 180);
     }
 	public boolean build(RobotType type, Direction dir) throws GameActionException {
-		return build(type, dir, 360);
+		return build(type, dir, 180);
 	}
 	public boolean build(RobotType type,Direction dir, int maxRotateDegrees) throws GameActionException {
 		if ((type.bulletCost > rc.getTeamBullets())
@@ -49,7 +52,8 @@ public abstract class Bot {
 		return tryRotateBuild(type, dir, maxRotateDegrees, ROTATE_INTERVAL);
 	}
 	private boolean tryRotateBuild(RobotType type, Direction dir, int maxRotateDegrees, int rotateInterval) throws GameActionException {
-		for (int i = rotateInterval; i <= maxRotateDegrees; i += rotateInterval) {
+		if (maxRotateDegrees > 180) maxRotateDegrees = 180;
+	    for (int i = rotateInterval; i <= maxRotateDegrees; i += rotateInterval) {
 			if (rc.canBuildRobot(type, dir.rotateLeftDegrees(i))) { rc.buildRobot(type, dir.rotateLeftDegrees(i)); return true; }
 			if (rc.canBuildRobot(type, dir.rotateRightDegrees(i))) { rc.buildRobot(type, dir.rotateRightDegrees(i)); return true; }
 		}
